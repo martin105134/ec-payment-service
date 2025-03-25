@@ -18,16 +18,24 @@ public class MainRestController {
     @Autowired
     AuthService authService;
 
+    @Autowired
+    AdminService adminService;
+
     @PostMapping("/create")
     public ResponseEntity<?> createPayment(@RequestBody PaymentRequest paymentRequest, @RequestHeader("Authorization") String token) throws InterruptedException {
         log.info("Create payment request in ecpayment service");
         if(authService.authenticate(token)) {
-            Thread.sleep(10000);
+            //Thread.sleep(5000);
+            if("stop".equalsIgnoreCase(adminService.getAdminEntryByKey("operation").getValue())) {
+                log.info("Stop the payment service");
+                throw new RuntimeException();
+            }
+            log.info("Start the payment service");
             Payment payment = new Payment();
             payment.setPaymentAmount(paymentRequest.getPaymentAmount());
             payment.setOrderId(paymentRequest.getOrderId());
-            payment.setPaymentId(String.valueOf(new Random().nextInt(1000)));
-            payment.setPaymentStatus("INITIATED");
+            payment.setPaymentId(String.valueOf(new Random().nextInt(10000)));
+            payment.setPaymentStatus("PAID");
             paymentRepo.save(payment);
             return ResponseEntity.ok(payment.getPaymentId());
         }else {
