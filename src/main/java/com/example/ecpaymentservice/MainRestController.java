@@ -19,9 +19,10 @@ public class MainRestController {
     AuthService authService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPayment(@RequestBody PaymentRequest paymentRequest, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createPayment(@RequestBody PaymentRequest paymentRequest, @RequestHeader("Authorization") String token) throws InterruptedException {
         log.info("Create payment request in ecpayment service");
         if(authService.authenticate(token)) {
+            Thread.sleep(10000);
             Payment payment = new Payment();
             payment.setPaymentAmount(paymentRequest.getPaymentAmount());
             payment.setOrderId(paymentRequest.getOrderId());
